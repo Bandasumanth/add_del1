@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+ <meta charset="UTF-8">
+
+ <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+ <title>Document</title>
+
+ <style>
+
+  table {
+
+   width: 100%;
+
+   border-collapse: collapse;
+
+  }
+
+  table, th, td {
+
+   border: 1px solid rgb(230, 4, 4);
+
+   padding: 8px;
+
+   text-align: center;
+
+  }
+
+  th {
+
+   background-color: #a7d1b2;
+
+  }
+
+  .edit, .remove {
+
+   cursor: pointer;
+   color: blue;
+
+   text-decoration: underline;
+
+  }
+tr, th{
+    font-size: 15px;
+}
+ </style>
+
+</head>
+
+<body>
+
+ <h2>Appending formdata in table</h2>
+
+ <form id="form">
+
+  Name:<input type="text" placeholder="Type name" id="name" required>
+
+  Email:<input type="email" placeholder="Email" id="email" required>
+
+  Password:<input type="password" placeholder="Password" id="pwd" required>
+  Range:<input type="range" id="range" value="10" min="5" max="50">
+  Date:<input type="date" id="date"><br><br>
+  <label for="">Gender</label>
+  <input type="radio" id="m" value="male" name="gen">Male
+  <input type="radio" id="f" value="female" name="gen">Female<br>
+  <input type="checkbox" id="a" value="a">A
+
+  <input type="checkbox" id="b" value="b">B
+
+  <input type="checkbox" id="c" value="c">C<br>
+
+  <select id="select">
+
+   <option selected disabled>Select option</option>
+
+   <option value="one">One</option>
+
+   <option value="two">Two</option>
+
+   <option value="three">Three</option>
+
+  </select>
+
+  <input type="submit" value="Submit">
+
+ </form>
+
+ <table id="tab">
+
+  <thead>
+
+   <tr>
+
+    <th>Name</th>
+
+    <th>Email</th>
+
+    <th>Password</th>
+
+    <th>Range</th>
+
+    <th>Gender</th>
+
+    <th>Checkbox</th>
+
+    <th>Dropdown</th>
+
+    <th>Date</th>
+
+    <th>Delete</th>
+
+    <th>Edit</th>
+
+   </tr>
+
+  </thead>
+
+  <tbody>
+
+  </tbody>
+
+ </table>
+
+ <script>
+
+  let editIndex = -1;
+
+  document.getElementById("form").addEventListener("submit", function(e) {
+
+   e.preventDefault();
+
+   submitForm();
+
+  });
+
+  function submitForm() {
+
+   let name = document.getElementById("name").value;
+
+   let email = document.getElementById("email").value;
+
+   let pwd = document.getElementById("pwd").value;
+
+   let range = document.getElementById("range").value;
+
+   let data = document.getElementById("date").value;
+
+   let cb = [];
+
+   document.querySelectorAll('input[type="checkbox"]:checked').forEach(function(checkbox) {
+
+    cb.push(checkbox.value);
+
+   });
+
+   let gender = "";
+
+   document.querySelectorAll('input[name="gen"]:checked').forEach(function(radio) {
+
+    gender = radio.value;
+
+   });
+
+   let select = document.getElementById("select").value;
+
+   let table = document.querySelector("#tab tbody");
+
+   if (editIndex === -1) {
+
+    let row = table.insertRow();
+
+    let deleteButton = document.createElement("button");
+
+    deleteButton.textContent = "Delete";
+
+    deleteButton.className = "remove";
+
+    deleteButton.onclick = function() {
+
+     deleteRow(row);
+
+    };
+
+    let editButton = document.createElement("button");
+
+    editButton.textContent = "Edit";
+
+    editButton.className = "edit";
+
+    editButton.onclick = function() {
+
+     editRow(row);
+
+    };
+
+    row.innerHTML = `
+
+     <td>${name}</td>
+
+     <td>${email}</td>
+
+     <td>${pwd}</td>
+
+     <td>${range}</td>
+
+     <td>${gender}</td>
+
+     <td>${cb.join(", ")}</td>
+
+     <td>${select}</td>
+
+     <td>${data}</td>
+
+     <td></td>
+
+     <td></td>
+
+    `;
+
+    let deleteCell = row.cells[8];
+
+    let editCell = row.cells[9];
+
+    deleteCell.appendChild(deleteButton);
+
+    editCell.appendChild(editButton);
+
+    table.appendChild(row);
+
+   } else {
+
+    let row = table.rows[editIndex];
+
+    row.cells[0].textContent = name;
+
+    row.cells[1].textContent = email;
+
+    row.cells[2].textContent = pwd;
+
+    row.cells[3].textContent = range;
+
+    row.cells[4].textContent = gender;
+
+    row.cells[5].textContent = cb.join(", ");
+
+    row.cells[6].textContent = select;
+
+    row.cells[7].textContent = data;
+
+    editIndex = -1;
+
+    document.getElementById("submit").value = "Submit";
+
+   }
+
+   document.getElementById("form").reset();
+
+  }
+
+  function deleteRow(row) {
+
+   let index = row.rowIndex;
+
+   document.getElementById("tab").deleteRow(index);
+
+  }
+
+  function editRow(row) {
+
+   editIndex = row.rowIndex;
+
+   document.getElementById("name").value = row.cells[0].textContent;
+
+   document.getElementById("email").value = row.cells[1].textContent;
+
+   document.getElementById("pwd").value = row.cells[2].textContent;
+
+   document.getElementById("range").value = row.cells[3].textContent;
+
+   let gender = row.cells[4].textContent;
+
+   if (gender === "male") {
+
+    document.getElementById("m").checked = true;
+
+   } else if (gender === "female") {
+
+    document.getElementById("f").checked = true;
+
+   }
+
+   let checkboxes = row.cells[5].textContent.split(", ");
+
+   document.getElementById("a").checked = checkboxes.includes("a");
+
+   document.getElementById("b").checked = checkboxes.includes("b");
+
+   document.getElementById("c").checked = checkboxes.includes("c");
+
+   document.getElementById("select").value = row.cells[6].textContent;
+   document.getElementById("date").value = row.cells[7].textContent;
+   document.getElementById("submit").value = "Update";
+
+  }
+
+ </script>
+
+</body>
+
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
